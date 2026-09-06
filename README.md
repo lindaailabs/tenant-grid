@@ -7,6 +7,21 @@
 
 **English** | [简体中文](README-zh.md)
 
+## Introduction
+
+Tenant Grid is a Java library for multi-tenant database routing, delivered as a Spring Boot starter: key accounts go to dedicated physical databases, long-tail tenants to shared logical ones — and Tenant Grid resolves the right datasource for every operation, keeping routing, isolation and migration state out of your business code.
+
+**What you get:**
+
+- **Hybrid shard routing** — `tenantId → DataSource` resolution for dedicated (physical) and shared (logical) databases alike; metadata from config, JDBC, or your own SPI
+- **Hot-swappable datasources** — onboard new tenants' databases and retire old ones at runtime, no restart
+- **Noisy-neighbor isolation** — per-tenant connection quotas, token-bucket rate limiting, statement timeouts, and automatic degradation & recovery
+- **Online migration** — an orchestration state machine (dual-write → catch-up → verify → cut-over → rollback); the actual data movement stays pluggable via SPI (DataX / Debezium / homegrown)
+- **SQL tenant-column guard** (optional) — AST-based verification that row-level SQL carries its tenant predicate
+- **Observability** — a single Actuator endpoint aggregating datasources, per-tenant usage, cache stats and active migrations
+
+The routing core (`tenant-grid-core`) has zero Spring dependencies and works standalone; the starter adds auto-configuration for Spring Boot 4.x. Requires Java 17+.
+
 ## What It Solves
 
 Multi-tenant SaaS systems — overseas warehousing being a typical case — rarely settle on a single data-placement mode:
