@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!--
+    组织命名空间，全项目仅在此处定义一处，子模块通过 <parent> 继承。
+
+    当前值 io.github.lindaailabs：Maven Central 通过 GitHub 组织所有权验证归属（在组织下
+    创建一个指定名称的临时公共仓库即可），不需要购买域名——个人开源项目用这个最省事。
+
+    若改用自有域名（如 org.lindaailabs），除下面这一行外，还要动三处：
+      1. 把 Java 包目录从 io/github/lindaailabs/tenantgrid 挪到 org/lindaailabs/tenantgrid
+      2. 同步 starter 自动装配注册文件里的类名
+      3. 在 Central Portal 完成该域名的 DNS TXT 验证，否则发布会被拒
+  -->
+  <groupId>io.github.lindaailabs</groupId>
+  <artifactId>tenant-grid</artifactId>
+  <version>0.5.0</version>
+  <packaging>pom</packaging>
+
+  <name>Tenant Grid</name>
+  <description>
+    Multi-tenant database placement and lifecycle for SaaS — hybrid physical/logical shard routing,
+    tenant migration and noisy-neighbour isolation, made simple.
+  </description>
+  <url>https://github.com/lindaailabs/tenant-grid</url>
+
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>lindaailabs</id>
+      <name>lindaailabs</name>
+      <url>https://github.com/lindaailabs</url>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git://github.com/lindaailabs/tenant-grid.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/lindaailabs/tenant-grid.git</developerConnection>
+    <url>https://github.com/lindaailabs/tenant-grid</url>
+  </scm>
+
+  <modules>
+    <module>tenant-grid-core</module>
+    <module>tenant-grid-spring-boot-starter</module>
+    <module>tenant-grid-bom</module>
+  </modules>
+
+  <properties>
+    <maven.compiler.release>17</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <spring-boot.version>4.0.6</spring-boot.version>
+    <slf4j.version>2.0.16</slf4j.version>
+    <ttl.version>2.14.5</ttl.version>
+    <jsqlparser.version>5.3</jsqlparser.version>
+
+    <junit.version>5.11.4</junit.version>
+    <assertj.version>3.27.3</assertj.version>
+    <mockito.version>5.14.2</mockito.version>
+    <h2.version>2.4.240</h2.version>
+
+    <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+    <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
+    <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.alibaba</groupId>
+        <artifactId>transmittable-thread-local</artifactId>
+        <version>${ttl.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>${junit.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${assertj.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+        <version>${h2.version}</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- 明确要求 JDK 17+：否则用 JDK 8 构建时会得到难以理解的 javac 报错 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>${maven-enforcer-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>enforce-java-version</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireJavaVersion>
+                  <version>[17,)</version>
+                  <message>
+                    Tenant Grid requires JDK 17+ to build (compiles with --release 17).
+                    Detected: ${java.version}
+                    Fix: point JAVA_HOME at a JDK 17+ installation.
+                  </message>
+                </requireJavaVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${maven-surefire-plugin.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <!--
+    发布用插件全部收在 release profile 里，默认不激活：
+    日常构建（test / install）不会去解析 gpg、central-publishing，离线环境也能照常构建。
+
+    发布前置条件：
+      1. Maven Central 的 namespace io.github.lindaailabs 已完成 GitHub 组织所有权验证
+      2. 本机已配置 GPG 密钥（用 gpg 能列出可用的签名密钥）
+      3. ~/.m2/settings.xml 里配好 Central Portal 的发布令牌，server id 为 central
+
+    用法（需要联网下载下列插件）：
+      mvn -Prelease deploy                    # 签名并上传，等 Central 校验后人工点发布
+      mvn -Prelease -Dgpg.skip=true deploy    # 不签名，仅验证打包是否正常
+  -->
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.3.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!--
+            Central 强制要求 javadoc jar。关掉 doclint 是因为 JDK 8+ 的 doclint 过于严格，
+            注释里一个不规范的标签就会让整个发布构建失败——而这与代码质量无关。
+          -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.11.2</version>
+            <configuration>
+              <doclint>none</doclint>
+              <quiet>true</quiet>
+            </configuration>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>3.2.7</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!--
+            Sonatype Central Portal：整批上传后由 Central 侧校验，
+            校验通过再在控制台人工点发布（autoPublish=false），避免误发不可撤回的版本。
+          -->
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.7.0</version>
+            <extensions>true</extensions>
+            <configuration>
+              <publishingServerId>central</publishingServerId>
+              <autoPublish>false</autoPublish>
+              <waitUntil>validated</waitUntil>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
