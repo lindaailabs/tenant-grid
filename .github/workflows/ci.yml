@@ -25,3 +25,20 @@ jobs:
 
       - name: Build & Test
         run: mvn -B -ntp verify
+
+  # starter 的 Spring 依赖全部 provided，API 面在 3.5 与 4.x 间无破坏性变更；
+  # 这里用属性把 BOM 切到 3.5 全量跑测试，验证存量 Spring Boot 3 用户可直用
+  spring-boot-3-compat:
+    name: Spring Boot 3.5 compat
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Verify against Spring Boot 3.5
+        run: mvn -B -ntp verify -Dspring-boot.version=3.5.16

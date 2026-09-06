@@ -635,7 +635,7 @@ optimization.
 ## Tech Baseline
 
 - Java 17+
-- Spring Boot 4.x (the starter declares it `provided`, pinning nothing on the consumer)
+- Spring Boot 3.5+ / 4.x — compiled against 4.x; the starter declares Spring `provided`, pinning nothing on the consumer, and 3.5 compatibility is verified in CI
 - Maven multi-module
 
 ## Build

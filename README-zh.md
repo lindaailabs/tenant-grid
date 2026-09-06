@@ -562,7 +562,7 @@ curl localhost:8080/actuator/tenantgrid
 ## 技术基线
 
 - Java 17+
-- Spring Boot 4.x（starter 以 `provided` 引入，不绑定使用方版本）
+- Spring Boot 3.5+ / 4.x（编译基线 4.x；starter 以 `provided` 引入不绑定使用方版本，3.5 兼容性由 CI 验证）
 - Maven 多模块
 
 ## 构建
